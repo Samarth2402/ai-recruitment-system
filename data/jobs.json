@@ -1,0 +1,29 @@
+[
+    {
+        "job_id": 1,
+        "title": "python",
+        "skills": [
+            "python"
+        ],
+        "min_exp": 0,
+        "max_exp": 5,
+        "min_10": 80,
+        "min_12": 80,
+        "min_grad": 90,
+        "hr_id": 2
+    },
+    {
+        "job_id": 2,
+        "title": "Mern Stack developer",
+        "skills": [
+            "python",
+            "flask"
+        ],
+        "min_exp": 0,
+        "max_exp": 10,
+        "min_10": 50,
+        "min_12": 50,
+        "min_grad": 60,
+        "hr_id": 2
+    }
+]

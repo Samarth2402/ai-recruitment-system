@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Applied Candidates | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: #e5e7eb;
+        }
+
+        .page {
+            padding: 40px 60px;
+            min-height: 100vh;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .application-card {
+            background: linear-gradient(135deg, #020617, #1e293b);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .application-card h3 {
+            margin-bottom: 10px;
+            color: #f9fafb;
+        }
+
+        .application-card p {
+            margin: 6px 0;
+            color: #cbd5f5;
+            font-size: 14px;
+        }
+
+        .application-card a {
+            color: #38bdf8;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .application-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Status badges */
+        .status {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.applied {
+            background: #1e40af;
+            color: #bfdbfe;
+        }
+
+        .status.shortlisted {
+            background: #14532d;
+            color: #bbf7d0;
+        }
+
+        .status.rejected {
+            background: #7f1d1d;
+            color: #fecaca;
+        }
+
+        /* Action buttons */
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-shortlist {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <h2>📋 Applied Candidates</h2>
+
+    {% if applications %}
+    <div class="applications-grid">
+        {% for app in applications %}
+        <div class="application-card">
+
+            <h3>👤 {{ app.candidate }}</h3>
+
+            <p><b>Match Score:</b> {{ app.score }}%</p>
+            <p><b>Matched Skills:</b> {{ app.matched_skills | join(", ") }}</p>
+
+            <p>
+                {% if app.resume_filename %}
+                    <a href="/download_resume/{{ app.resume_filename }}">📄 View Resume</a>
+                {% else %}
+                    <span>No Resume</span>
+                {% endif %}
+            </p>
+
+            <p>
+                <b>Status:</b>
+                <span class="status {{ app.status|lower }}">
+                    {{ app.status }}
+                </span>
+            </p>
+
+            {% if app.status == "applied" %}
+            <div class="actions">
+                <a href="/shortlist/{{ app.app_id }}" class="btn btn-shortlist">Shortlist</a>
+                <a href="/reject/{{ app.app_id }}" class="btn btn-reject">Reject</a>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>No applications found.</p>
+    {% endif %}
+
+    <a href="/hr_dashboard" class="back-link">← Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

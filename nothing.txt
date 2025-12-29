@@ -1,0 +1,554 @@
+from flask import Flask, render_template, request, redirect, session
+import os
+import random
+import smtplib
+
+from data_manager import read_json, write_json
+from resume_parser import extract_text_from_pdf
+from skill_matcher import calculate_match_score
+from interview_engine import generate_questions, evaluate_answers
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+
+app = Flask(__name__)
+app.secret_key = "secret123"
+
+# ================= SMTP CONFIG =================
+SMTP_EMAIL = "ss9879086402@gmail.com"
+SMTP_PASSWORD = "ojwsndwozpbrmcuk"
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+
+# ================= PATHS =================
+USERS_FILE = "data/users.json"
+JOBS_FILE = "data/jobs.json"
+APPLICATIONS_FILE = "data/applications.json"
+OTP_FILE = "data/otp.json"
+INTERVIEWS_FILE = "data/interviews.json"
+RESUME_FOLDER = "resumes"
+SCHEDULE_FILE = "data/scheduled_interviews.json"
+
+os.makedirs("data", exist_ok=True)
+os.makedirs(RESUME_FOLDER, exist_ok=True)
+
+# ================= QUESTION BANK =================
+
+QUESTION_BANK = {
+    "python": {
+        "easy": [
+            "What is Python?",
+            "What are lists and tuples?",
+            "What is a function in Python?"
+        ],
+        "medium": [
+            "Explain OOP concepts in Python",
+            "Difference between list and set",
+            "What is Flask?"
+        ],
+        "hard": [
+            "Explain decorators",
+            "What is multithreading?",
+            "Explain Python memory management"
+        ]
+    },
+    "sql": {
+        "easy": [
+            "What is SQL?",
+            "What is a primary key?"
+        ],
+        "medium": [
+            "Explain joins",
+            "Difference between WHERE and HAVING"
+        ],
+        "hard": [
+            "Explain normalization",
+            "Index vs View"
+        ]
+    }
+}
+
+# ================= HELPERS =================
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+
+def send_email_otp(to_email, otp):
+    subject = "OTP Verification - AI Recruitment System"
+    body = f"""
+Hello,
+
+Your OTP for registration is: {otp}
+
+Regards,
+AI Recruitment System
+"""
+    message = f"From: AI Recruitment System <{SMTP_EMAIL}>\nSubject:{subject}\n\n{body}"
+
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()
+    server.login(SMTP_EMAIL, SMTP_PASSWORD)
+    server.sendmail(SMTP_EMAIL, to_email, message)
+    server.quit()
+
+def send_hr_decision_email(to_email, name, decision):
+    msg = MIMEMultipart()
+    msg["From"] = f"AI Recruitment System <{SMTP_EMAIL}>"
+    msg["To"] = to_email
+
+    if decision == "shortlisted":
+        msg["Subject"] = "You are Shortlisted | AI Recruitment System"
+
+        body = f"""
+Hello {name},
+
+Congratulations!
+
+You have been SHORTLISTED based on your mock interview performance.
+Our HR team will contact you soon for the next round.
+
+Keep preparing and stay confident.
+
+Regards,
+AI Recruitment System
+"""
+    else:
+        msg["Subject"] = "Interview Update | AI Recruitment System"
+
+        body = f"""
+Hello {name},
+
+Thank you for attending the mock interview.
+
+At this moment, we are unable to proceed with your profile.
+We encourage you to improve your weak areas and try again.
+
+Best wishes for your future.
+
+Regards,
+AI Recruitment System
+"""
+
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()
+    server.login(SMTP_EMAIL, SMTP_PASSWORD)
+    server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+    server.quit()
+    
+
+def send_interview_schedule_email(to_email, name, date, time, mode):
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    msg = MIMEMultipart()
+    msg["From"] = f"AI Recruitment System <{SMTP_EMAIL}>"
+    msg["To"] = to_email
+    msg["Subject"] = "Interview Scheduled | AI Recruitment System"
+
+    body = f"""
+Hello {name},
+
+Your interview has been scheduled.
+
+📅 Date: {date}
+⏰ Time: {time}
+📍 Mode: {mode}
+
+Please be available on time.
+Best of luck!
+
+Regards,
+AI Recruitment System
+"""
+
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()
+    server.login(SMTP_EMAIL, SMTP_PASSWORD)
+    server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+    server.quit()
+    
+    
+def get_difficulty(exp):
+    if exp <= 1:
+        return "easy"
+    elif exp <= 3:
+        return "medium"
+    return "hard"
+
+
+def extract_skills_safe(text):
+    skills = []
+    for skill in QUESTION_BANK.keys():
+        if skill in text.lower():
+            skills.append(skill)
+    return skills if skills else ["python"]
+
+
+# ================= AUTH =================
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    users = read_json(USERS_FILE)
+    message = None
+
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+
+        for user in users:
+            if user["email"] == email and user["password"] == password:
+                session["user"] = user
+                return redirect("/dashboard")
+
+        message = "Invalid email or password"
+
+    return render_template("login.html", message=message)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    users = read_json(USERS_FILE)
+    otp_data = read_json(OTP_FILE)
+
+    if not isinstance(otp_data, list):
+        otp_data = []
+
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "send":
+            email = request.form["email"]
+
+            for u in users:
+                if u["email"] == email:
+                    return render_template("register.html", error="Email already registered")
+
+            otp = generate_otp()
+
+            otp_data.append({
+                "name": request.form["name"],
+                "email": email,
+                "password": request.form["password"],
+                "role": request.form["role"],
+                "otp": otp
+            })
+            write_json(OTP_FILE, otp_data)
+            send_email_otp(email, otp)
+
+            return render_template("register.html", otp_sent=True)
+
+        if action == "verify":
+            entered_otp = request.form["otp"]
+
+            for record in otp_data:
+                if record["otp"] == entered_otp:
+                    users.append({
+                        "id": len(users) + 1,
+                        "name": record["name"],
+                        "email": record["email"],
+                        "password": record["password"],
+                        "role": record["role"]
+                    })
+                    write_json(USERS_FILE, users)
+                    write_json(OTP_FILE, [])
+                    return render_template("register.html", success=True)
+
+            return render_template("register.html", otp_sent=True, error="Invalid OTP")
+
+    return render_template("register.html")
+
+
+# ================= DASHBOARD =================
+
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
+        return redirect("/")
+    return render_template("dashboard.html", user=session["user"])
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+# ================= HR =================
+
+@app.route("/hr_dashboard")
+def hr_dashboard():
+    if session.get("user", {}).get("role") != "hr":
+        return "Access Denied"
+    return render_template("hr_dashboard.html", jobs=read_json(JOBS_FILE))
+
+
+@app.route("/post_job", methods=["GET", "POST"])
+def post_job():
+    if session.get("user", {}).get("role") != "hr":
+        return "Access Denied"
+
+    if request.method == "POST":
+        jobs = read_json(JOBS_FILE)
+        jobs.append({
+            "job_id": len(jobs) + 1,
+            "title": request.form["title"],
+            "skills": request.form["skills"].lower().split(","),
+            "min_exp": int(request.form["min_exp"]),
+            "max_exp": int(request.form["max_exp"]),
+            "min_10": int(request.form["min_10"]),
+            "min_12": int(request.form["min_12"]),
+            "min_grad": int(request.form["min_grad"]),
+            "hr_id": session["user"]["id"]
+        })
+        write_json(JOBS_FILE, jobs)
+        return redirect("/hr_dashboard")
+
+    return render_template("post_job.html")
+
+
+# ================= CANDIDATE =================
+
+@app.route("/upload_resume", methods=["GET", "POST"])
+def upload_resume():
+    if session.get("user", {}).get("role") != "candidate":
+        return "Access Denied"
+
+    if request.method == "POST":
+        file = request.files["resume"]
+        if file:
+            file.save(os.path.join(RESUME_FOLDER, f"{session['user']['id']}.pdf"))
+            return redirect("/jobs")
+
+    return render_template("upload_resume.html")
+
+
+@app.route("/jobs")
+def view_jobs():
+    if session.get("user", {}).get("role") != "candidate":
+        return "Access Denied"
+    return render_template("jobs.html", jobs=read_json(JOBS_FILE))
+
+@app.route("/my_interviews")
+def my_interviews():
+    if "user" not in session or session["user"]["role"] != "candidate":
+        return "Access Denied"
+
+    interviews = read_json(INTERVIEWS_FILE)
+
+    # ✅ ONLY this candidate’s interviews
+    user_interviews = [
+        i for i in interviews
+        if i["user_id"] == session["user"]["id"]
+    ]
+
+    return render_template(
+        "my_interviews.html",
+        interviews=user_interviews
+    )
+# ================= APPLY JOB =================
+
+@app.route("/apply_job/<int:job_id>", methods=["POST"])
+def apply_job(job_id):
+    resume_path = os.path.join(RESUME_FOLDER, f"{session['user']['id']}.pdf")
+    resume_text = extract_text_from_pdf(resume_path)
+    job = next(j for j in read_json(JOBS_FILE) if j["job_id"] == job_id)
+
+    score, _ = calculate_match_score(resume_text, job["skills"])
+
+    apps = read_json(APPLICATIONS_FILE)
+    apps.append({
+        "user_id": session["user"]["id"],
+        "job_id": job_id,
+        "score": score,
+        "status": "Applied"
+    })
+    write_json(APPLICATIONS_FILE, apps)
+
+    return render_template("application_result.html", status="Applied Successfully")
+
+
+# ================= MOCK INTERVIEW (DAY 6 FINAL) =================
+
+@app.route("/start_interview", methods=["GET"])
+def start_interview():
+    if "user" not in session or session["user"]["role"] != "candidate":
+        return "Access Denied"
+
+    resume_path = os.path.join(RESUME_FOLDER, f"{session['user']['id']}.pdf")
+    if not os.path.exists(resume_path):
+        return redirect("/upload_resume")
+
+    resume_text = extract_text_from_pdf(resume_path)
+
+    # clean skill extraction
+    words = resume_text.lower().split()
+    skills = list(set(words))[:4]   # max 4 questions
+
+    questions = generate_questions(skills)
+
+    session["questions"] = questions
+
+    return render_template("interview.html", questions=questions)
+
+
+
+@app.route("/submit_interview", methods=["POST"])
+def submit_interview():
+    questions = session.get("questions", [])
+
+    answers = []
+    for i in range(len(questions)):
+        answers.append(request.form.get(f"answer_{i}", ""))
+
+    score, weak_areas, readiness = evaluate_answers(questions, answers)
+
+    interviews = read_json(INTERVIEWS_FILE)
+
+    # 🔥 REMOVE OLD INTERVIEW OF SAME USER
+    interviews = [i for i in interviews if i["user_id"] != session["user"]["id"]]
+
+    # ✅ ADD NEW ONE
+    interviews.append({
+        "user_id": session["user"]["id"],
+        "score": score,
+        "weak_areas": weak_areas,
+        "readiness": readiness,
+        "hr_decision": "pending"
+    })
+
+    write_json(INTERVIEWS_FILE, interviews)
+
+    return render_template(
+        "interview_result.html",
+        score=score,
+        weak_areas=weak_areas,
+        readiness=readiness
+    )
+
+
+@app.route("/hr_interviews")
+def hr_interviews():
+    if "user" not in session or session["user"]["role"] != "hr":
+        return "Access Denied"
+
+    interviews = read_json(INTERVIEWS_FILE)
+    users = read_json(USERS_FILE)
+    schedules = read_json("data/scheduled_interviews.json")
+
+    reports = []
+
+    for i in interviews:   # ✅ LOOP ALL
+        user = next((u for u in users if u["id"] == i["user_id"]), None)
+
+        if not user:
+            continue
+
+        schedule = None
+        for s in schedules:
+            if s["user_id"] == user["id"]:
+                schedule = s
+                break
+
+        reports.append({
+            "user_id": user["id"],
+            "name": user["name"],
+            "email": user["email"],
+            "score": i["score"],
+            "weak_areas": i["weak_areas"],
+            "readiness": i["readiness"],
+            "hr_decision": i.get("hr_decision", "pending"),
+            "schedule": schedule
+        })
+
+    return render_template(
+        "hr_interviews.html",
+        interviews=reports
+    )
+    
+ 
+@app.route("/hr_decision/<int:user_id>/<decision>")
+def hr_decision(user_id, decision):
+    if "user" not in session or session["user"]["role"] != "hr":
+        return "Access Denied"
+
+    interviews = read_json(INTERVIEWS_FILE)
+
+    for interview in interviews:
+        if interview["user_id"] == user_id:
+            interview["hr_decision"] = decision
+
+            # Update readiness based on HR decision
+            if decision == "shortlisted":
+                interview["readiness"] = "Ready"
+            else:
+                interview["readiness"] = "Not Ready"
+
+            # ✅ SEND EMAIL HERE
+           users = read_json(USERS_FILE)
+user = next(u for u in users if u["id"] == user_id)
+
+email = user["email"]
+name = user["name"]
+
+send_hr_decision_email(email, name, decision)
+            break
+
+    write_json(INTERVIEWS_FILE, interviews)
+    return redirect("/hr_interviews")
+
+@app.route("/schedule_interview/<int:user_id>", methods=["GET", "POST"])
+def schedule_interview(user_id):
+    if "user" not in session or session["user"]["role"] != "hr":
+        return "Access Denied"
+
+    interviews = read_json(INTERVIEWS_FILE)
+    schedule_data = read_json(SCHEDULE_FILE)
+
+    candidate = None
+    for i in interviews:
+        if i["user_id"] == user_id:
+            candidate = i
+            break
+
+    if not candidate:
+        return "Candidate not found"
+
+    if request.method == "POST":
+        date = request.form["date"]
+        time = request.form["time"]
+        mode = request.form["mode"]
+
+        schedule_data.append({
+            "user_id": user_id,
+            "name": candidate["name"],
+            "email": candidate["email"],
+            "date": date,
+            "time": time,
+            "mode": mode
+        })
+
+        write_json(SCHEDULE_FILE, schedule_data)
+
+        send_interview_schedule_email(
+            candidate["email"],
+            candidate["name"],
+            date,
+            time,
+            mode
+        )
+
+        return redirect("/hr_interviews")
+
+    return render_template(
+        "schedule_interview.html",
+        candidate=candidate
+    )
+# ================= RUN =================
+
+if __name__ == "__main__":
+    app.run(debug=True)

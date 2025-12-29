@@ -1,0 +1,15 @@
+[
+    {
+        "user_id": 1,
+        "score": 0,
+        "weak_areas": [
+            "What is Machine Learning?",
+            "Difference between supervised and unsupervised learning.",
+            "What is overfitting?",
+            "Explain train-test split.",
+            "What is SQL?"
+        ],
+        "readiness": "Not Ready",
+        "hr_decision": "rejected"
+    }
+]

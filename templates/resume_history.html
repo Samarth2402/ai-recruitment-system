@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page-full">
+
+    <h2>📁 Resume History</h2>
+
+    {% if resumes %}
+    <table class="applied-table">
+        <tr>
+            <th>Resume Name</th>
+            <th>Uploaded On</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for r in resumes %}
+        <tr>
+            <td>{{ r.filename }}</td>
+            <td>{{ r.uploaded_on }}</td>
+
+            <td>
+                {% if r.is_active %}
+                    <span style="color:green;font-weight:bold;">Active</span>
+                {% else %}
+                    <span style="color:gray;">Inactive</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/download_resume/{{ r.filename }}">Download</a>
+
+                {% if not r.is_active %}
+                    | <a href="/set_active_resume/{{ r.resume_id }}">Set Active</a>
+                    | <a href="/delete_resume/{{ r.resume_id }}"
+                         onclick="return confirm('Delete this resume?')"
+                         style="color:red;">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No resumes uploaded yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="/dashboard">← Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

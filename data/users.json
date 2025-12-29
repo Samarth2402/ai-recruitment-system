@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "name": "Samarth",
+        "email": "ss9879086402@gmail.com",
+        "password": "Samarth@1009",
+        "role": "candidate"
+    },
+    {
+        "id": 2,
+        "name": "Sujal",
+        "email": "samartha240057@gmail.com",
+        "password": "Sujal@1902",
+        "role": "hr"
+    }
+]

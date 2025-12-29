@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Dashboard | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page-full">
+
+    <h2>🧑‍💼 HR Dashboard</h2>
+
+    <div style="margin-bottom: 20px;">
+        <a href="/post_job" class="btn-primary">➕ Post New Job</a>
+        &nbsp;&nbsp;
+        <a href="/hr_applications" class="btn-primary">📄 View Applied Candidates</a>
+    </div>
+
+    <h3 style="margin-top: 30px;">📌 Posted Jobs</h3>
+
+    {% if jobs %}
+    <div class="jobs-grid">
+
+        {% for job in jobs %}
+        <div class="job-card-dark">
+            <h3>{{ job.title }}</h3>
+            <p><b>Skills:</b> {{ job.skills }}</p>
+
+            <a href="/hr_applications{{ job.id }}" class="btn-primary">
+                View Candidates
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+        <p>No jobs posted yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="/dashboard" class="back-link">← Back</a>
+
+</div>
+
+</body>
+</html>

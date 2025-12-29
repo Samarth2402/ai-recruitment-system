@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+    <h2>👋 Welcome, {{ user.name }}</h2>
+    <p class="role">Role: {{ user.role | capitalize }}</p>
+</div>
+
+    <!-- ================= MAIN ACTION CARDS ================= -->
+    <div class="card-container">
+
+        {% if user.role == "candidate" %}
+
+            <a href="/upload_resume" class="card">
+                📄<br>
+                <span>Upload Resume</span>
+            </a>
+
+            <a href="/resume_history" class="card">
+                📂<br>
+                <span>Resume History</span>
+            </a>
+
+            <a href="/jobs" class="card">
+                💼<br>
+                <span>View Jobs</span>
+            </a>
+
+            <a href="/start_interview" class="card">
+                🎤<br>
+                <span>Mock Interview</span>
+            </a>
+
+            <a href="/my_interviews" class="card">
+                📊<br>
+                <span>Interview History</span>
+            </a>
+
+        {% else %}
+
+            <a href="/post_job" class="card">
+                ➕<br>
+                <span>Post Job</span>
+            </a>
+
+            <a href="/hr_dashboard" class="card">
+                📋<br>
+                <span>Applications</span>
+            </a>
+
+            <a href="/hr_interviews" class="card">
+                📊<br>
+                <span>Interview Reports</span>
+            </a>
+
+        {% endif %}
+
+    </div>
+
+    <!-- ================= APPLIED JOBS SECTION ================= -->
+    {% if user.role == "candidate" %}
+    <div class="applied-section">
+
+        <h3>📄 Applied Jobs</h3>
+
+        {% if applied_jobs %}
+            <table class="applied-table">
+                <tr>
+                    <th>Job Title</th>
+                    <th>Match Score</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for job in applied_jobs %}
+                <tr>
+                    <td>{{ job.job_title }}</td>
+                    <td>{{ job.score }}%</td>
+                    <td><span class="status status-{{ job.status | lower }}">
+                        {{ job.status }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="no-data">No jobs applied yet.</p>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+    <!-- LOGOUT -->
+    <a href="/logout" class="logout">Logout</a>
+
+</div>
+
+</body>
+</html>
