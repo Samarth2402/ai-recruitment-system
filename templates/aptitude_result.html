@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aptitude Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .result-page{
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:linear-gradient(135deg,#020617,#0f172a);
+        }
+        .result-card{
+            background:#1e293b;
+            padding:40px;
+            border-radius:20px;
+            width:420px;
+            text-align:center;
+            box-shadow:0 15px 40px rgba(0,0,0,.5);
+            color:#e5e7eb;
+        }
+        .page-title{margin:0;font-size:24px;}
+        .subtitle{color:#94a3b8;margin-bottom:25px;}
+        .score-circle{
+            width:120px;height:120px;
+            border-radius:50%;
+            background:#020617;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            font-weight:bold;
+            margin:0 auto 20px;
+            color:#38bdf8;
+        }
+        .status-pass{color:#22c55e;font-weight:600;}
+        .status-fail{color:#ef4444;font-weight:600;}
+        .status-pending{color:#facc15;font-weight:600;}
+        .back-btn{
+            display:inline-block;
+            margin-top:25px;
+            color:#38bdf8;
+            text-decoration:none;
+            font-weight:600;
+        }
+        .back-btn:hover{text-decoration:underline;}
+    </style>
+</head>
+<body>
+
+<div class="result-page">
+<div class="result-card">
+
+<h2 class="page-title">📊 Aptitude Test Result</h2>
+<p class="subtitle">Here’s how you performed</p>
+
+<div class="score-circle">
+    {{ result.score }}/{{ result.total }}
+</div>
+
+<!-- 🔥 PASS / FAIL -->
+{% if result.score >= (result.total * 0.7) %}
+    <p class="status-pass">✅ Great job! You cleared the test.</p>
+{% else %}
+    <p class="status-fail">⚠️ Needs improvement.</p>
+{% endif %}
+
+<p style="margin-top:10px;">
+Level: <b>{{ result.level | upper }}</b>
+</p>
+
+<hr style="margin:20px 0;border:1px solid #334155;">
+
+<!-- 🔥 FINAL DECISION -->
+<p>
+<b>Final Status:</b><br>
+
+{% if result.decision == "tech" %}
+    <span class="status-pass">
+        🎉 Selected for Technical Round
+    </span>
+{% elif result.decision == "rejected" %}
+    <span class="status-fail">
+        ❌ Not Selected
+    </span>
+{% else %}
+    <span class="status-pending">
+        ⏳ Waiting for HR Review
+    </span>
+{% endif %}
+</p>
+
+<a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+
+</div>
+</div>
+
+</body>
+</html>

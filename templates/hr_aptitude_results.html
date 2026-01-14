@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR | Aptitude Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+<h2>🧠 Candidate Aptitude Results</h2>
+
+{% if history %}
+<table class="applied-table">
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Level</th>
+        <th>Score</th>
+        <th>Total</th>
+        <th>Status</th>
+    </tr>
+
+    {% for h in history %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ h.name }}</td>
+        <td>{{ h.email }}</td>
+        <td>{{ h.level | upper }}</td>
+        <td>{{ h.score }}</td>
+        <td>{{ h.total }}</td>
+        <td>
+            {% if h.score >= (h.total * 0.6) %}
+                <span style="color:#22c55e; font-weight:600;">PASS</span>
+            {% else %}
+                <span style="color:#ef4444; font-weight:600;">FAIL</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No aptitude data available.</p>
+{% endif %}
+
+<br>
+<a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

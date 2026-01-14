@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Resume | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+   <div class="page">
+
+    <h2 class="page-title">📄 Upload Resume</h2>
+
+    <div class="upload-wrapper">
+
+        <div class="upload-card">
+
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="resume" required>
+                <button type="submit" class="btn-primary">Upload Resume</button>
+            </form>
+
+            <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

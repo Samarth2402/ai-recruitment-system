@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register | AI Recruitment</title>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("TDVCcIay43p3fA3rJ"); // ✅ Public Key
+        })();
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI", sans-serif;
+            color: #e5e7eb;
+        }
+        .register-card {
+            background: #020617;
+            padding: 40px;
+            width: 380px;
+            border-radius: 16px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: none;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .msg { text-align: center; margin-bottom: 10px; }
+        .success { color: #22c55e; }
+        .error { color: #f87171; }
+    </style>
+</head>
+
+<body>
+
+<div class="register-card">
+    <h2 style="text-align:center">📝 Register</h2>
+
+    <div id="msg" class="msg"></div>
+
+    <div id="step1">
+        <input id="name" placeholder="Full Name">
+        <input id="email" type="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+
+        <select id="role">
+            <option value="">Select Role</option>
+            <option value="candidate">Candidate</option>
+            <option value="hr">HR</option>
+        </select>
+
+        <button onclick="sendOTP()">Send OTP</button>
+    </div>
+
+    <div id="step2" style="display:none;">
+        <input id="otp_input" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+</div>
+
+<script>
+
+
+function showMsg(text, isError = false) {
+    const msg = document.getElementById("msg");
+    msg.textContent = text;
+    msg.className = "msg " + (isError ? "error" : "success");
+}
+
+function sendOTP() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const role = document.getElementById("role").value;
+
+    if (!name || !email || !password || !role) {
+        showMsg("Please fill all fields", true);
+        return;
+    }
+
+    fetch("/send_otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            showMsg("Failed to send OTP", true);
+            return;
+        }
+
+        emailjs.send("service_9xxnbbh", "template_oqlepjk", {
+            name: name,
+            otp: data.otp,
+            to_email: email
+        }).then(() => {
+            showMsg("OTP sent to your email");
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+        });
+    });
+}
+function verifyOTP() {
+    const enteredOTP = document.getElementById("otp_input").value.trim();
+
+    fetch("/verify_otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp: enteredOTP })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            showMsg("Invalid OTP", true);
+            return;
+        }
+
+        // OTP verified → now register user
+        fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                role: document.getElementById("role").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showMsg("Registration successful 🎉");
+                setTimeout(() => window.location.href = "/", 1200);
+            } else {
+                showMsg(data.message, true);
+            }
+        });
+    });
+}
+</script>
+
+</body>
+</html>

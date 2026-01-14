@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header">
+    <h2>👋 Welcome, {{ user.name }}</h2>
+    <p class="role">Role: {{ user.role | capitalize }}</p>
+</div>
+
+<!-- ================= MAIN ACTION CARDS ================= -->
+<div class="card-container">
+
+{% if user.role == "candidate" %}
+
+    <a href="/upload_resume" class="card">📄<br><span>Upload Resume</span></a>
+    <a href="/resume_history" class="card">📂<br><span>Resume History</span></a>
+    <a href="/jobs" class="card">💼<br><span>View Jobs</span></a>
+    <a href="/start_interview" class="card">🎤<br><span>Mock Interview</span></a>
+    <a href="/my_interviews" class="card">📊<br><span>Interview History</span></a>
+	{% if aptitude_allowed and not aptitude_done %}
+    <a href="/aptitude_start" class="card">🧠<br>Aptitude Test</a>
+	{% elif aptitude_done %}
+		<div class="card" style="opacity:0.6;">
+			🧠<br>Test Completed
+		</div>
+	{% endif %}
+    <a href="/aptitude_history" class="card">📜<br><span>Aptitude History</span></a>
+
+{% else %}
+
+    <a href="/post_job" class="card">➕<br><span>Post Job</span></a>
+    <a href="/hr_dashboard" class="card">📋<br><span>Applications</span></a>
+    <a href="/hr_interviews" class="card">📊<br><span>Interview Reports</span></a>
+    <a href="/hr_history" class="card">📜<br><span>Decision History</span></a>
+    <a href="/hr_aptitude" class="card">🧠<br><span>Aptitude Results</span></a>
+
+{% endif %}
+
+</div>
+
+<!-- ================================================= -->
+<!-- =============== CANDIDATE SECTION =============== -->
+<!-- ================================================= -->
+{% if user.role == "candidate" %}
+
+<!-- ================= APTITUDE RESULT ================= -->
+{% if aptitude_result %}
+<div class="applied-section">
+
+    <h3>🧠 Aptitude Test Result</h3>
+
+    <table class="applied-table">
+        <tr>
+            <th>Level</th>
+            <th>Score</th>
+            <th>Total</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>{{ aptitude_result.level | upper }}</td>
+            <td>{{ aptitude_result.score }}</td>
+            <td>{{ aptitude_result.total }}</td>
+            <td>
+                {% if aptitude_result.decision == "tech" %}
+                    <span style="color:#22c55e;">Selected for Tech Round</span>
+                {% elif aptitude_result.decision == "rejected" %}
+                    <span style="color:#ef4444;">Not Selected</span>
+                {% else %}
+                    <span style="color:#facc15;">Pending</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+</div>
+{% endif %}
+
+<!-- ================= APPLIED JOBS ================= -->
+{% if applied_jobs %}
+<div class="applied-section">
+
+<h3>📄 Applied Jobs</h3>
+
+<table class="applied-table">
+<tr>
+    <th>Job Title</th>
+    <th>Experience</th>
+    <th>10th %</th>
+    <th>12th %</th>
+    <th>Graduation %</th>
+    <th>Status</th>
+</tr>
+
+{% for job in applied_jobs %}
+<tr>
+    <td>{{ job.job_title }}</td>
+    <td>{{ job.experience }} yrs</td>
+    <td>{{ job.tenth }}%</td>
+    <td>{{ job.twelfth }}%</td>
+    <td>{{ job.graduation }}%</td>
+    <td>
+        <span class="status status-{{ job.status | lower }}">
+            {{ job.status }}
+        </span>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+{% endif %}
+
+{% endif %}
+
+<!-- ================= LOGOUT ================= -->
+<a href="/logout" class="logout">Logout</a>
+
+</div>
+
+</body>
+</html>

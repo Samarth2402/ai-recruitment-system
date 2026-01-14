@@ -1,0 +1,22 @@
+[
+    {
+        "user_id": 1,
+        "name": "Samarth",
+        "email": "ss9879086402@gmail.com",
+        "level": "easy",
+        "score": 4,
+        "total": 10,
+        "percentage": 40.0,
+        "decision": "tech"
+    },
+    {
+        "user_id": 1,
+        "name": "Samarth",
+        "email": "ss9879086402@gmail.com",
+        "level": "easy",
+        "score": 0,
+        "total": 10,
+        "percentage": 0.0,
+        "decision": "pending"
+    }
+]

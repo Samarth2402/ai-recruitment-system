@@ -1,0 +1,15 @@
+[
+    {
+        "job_id": 1,
+        "title": "Python Developers",
+        "skills": [
+            "python"
+        ],
+        "min_exp": 0,
+        "max_exp": 5,
+        "min_10": 50,
+        "min_12": 50,
+        "min_grad": 50,
+        "hr_id": 2
+    }
+]

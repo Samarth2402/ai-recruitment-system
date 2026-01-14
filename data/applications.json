@@ -1,0 +1,14 @@
+[
+    {
+        "user_id": 1,
+        "job_id": 1,
+        "job_title": "Python Developers",
+        "experience": 0,
+        "tenth": 80,
+        "twelfth": 80,
+        "graduation": 80,
+        "status": "Applied",
+        "aptitude_required": false,
+        "aptitude_status": "not_assigned"
+    }
+]

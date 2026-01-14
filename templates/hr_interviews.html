@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Interview Panel | AI Recruitment</title>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        emailjs.init("TDVCcIay43p3fA3rJ");
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: #e5e7eb;
+        }
+        .page { padding: 40px 60px; min-height: 100vh; }
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; }
+        .report-card { background: #1e293b; border-radius: 18px; padding: 22px; }
+
+        .btn-success { background:#22c55e; }
+        .btn-danger { background:#ef4444; }
+        .btn-primary { background:#2563eb; }
+
+        button {
+            padding:10px 16px;
+            border-radius:20px;
+            border:none;
+            color:white;
+            cursor:pointer;
+            margin-right:10px;
+        }
+
+        .schedule-box {
+            margin-top: 15px;
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #1e293b;
+            background: #020617;
+            color: #e5e7eb;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+<h2>🧑‍💼 HR Interview Dashboard</h2>
+
+{% if interviews %}
+<div class="report-grid">
+{% for interview in interviews %}
+<div class="report-card">
+
+    <h3>{{ interview.name }}</h3>
+    <p>{{ interview.email }}</p>
+
+    <p>Score: {{ interview.score }}%</p>
+
+    <!-- STATUS -->
+    <p>
+    Status:
+    {% if interview.hr_decision == "shortlisted" %}
+        <span style="color:#22c55e; font-weight:600;">Shortlisted</span>
+    {% elif interview.hr_decision == "rejected" %}
+        <span style="color:#ef4444; font-weight:600;">Rejected</span>
+    {% else %}
+        <span style="color:#facc15; font-weight:600;">Pending</span>
+    {% endif %}
+    </p>
+
+    <!-- ================= DECISION BUTTONS (ONLY WHEN PENDING) ================= -->
+    {% if interview.hr_decision == "pending" %}
+    <div>
+        <button class="btn-success"
+            onclick="sendDecision(
+                {{ interview.user_id }},
+                '{{ interview.email }}',
+                '{{ interview.name }}',
+                'SHORTLISTED 🎉',
+                'Congratulations! You have been shortlisted.'
+            )">
+            Shortlist
+        </button>
+
+        <button class="btn-danger"
+            onclick="sendDecision(
+                {{ interview.user_id }},
+                '{{ interview.email }}',
+                '{{ interview.name }}',
+                'REJECTED',
+                'Thank you for applying. Unfortunately, you were not selected.'
+            )">
+            Reject
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- ================= SCHEDULE (ONLY WHEN SHORTLISTED) ================= -->
+    {% if interview.hr_decision == "shortlisted" %}
+    <div class="schedule-box">
+
+        {% if not interview.schedule %}
+        <h4>📅 Schedule Interview</h4>
+
+        <input type="date" id="date_{{ interview.user_id }}">
+        <input type="time" id="time_{{ interview.user_id }}">
+
+        <select id="mode_{{ interview.user_id }}">
+            <option value="">Select Mode</option>
+            <option value="Online">Online</option>
+            <option value="Offline">Offline</option>
+        </select>
+
+        <button class="btn-primary"
+            onclick="scheduleInterview(
+                '{{ interview.email }}',
+                '{{ interview.name }}',
+                {{ interview.user_id }}
+            )">
+            Schedule Interview
+        </button>
+
+        {% else %}
+        <p style="color:#22c55e; font-weight:600;">
+            ✅ Interview Scheduled ({{ interview.schedule.date }} at {{ interview.schedule.time }} - {{ interview.schedule.mode }})
+        </p>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p>No interview records.</p>
+{% endif %}
+<a href="/dashboard" style="
+    display:inline-block;
+    margin-bottom:20px;
+    color:#38bdf8;
+    font-weight:600;
+    text-decoration:none;
+">
+    ← Back to Dashboard
+</a>
+</div>
+
+<script>
+function sendDecision(userId, email, name, decisionTitle, message) {
+
+    let decision = decisionTitle.includes("SHORTLIST") ? "shortlisted" : "rejected";
+
+    // ✅ Backend call
+    fetch(`/hr_decision/${userId}/${decision}`)
+        .then(() => {
+
+            // ✅ EmailJS
+            emailjs.send(
+                "service_9xxnbbh",
+                "template_nxmv7zb",
+                {
+                    to_email: email,
+                    name: name,
+                    decision: decisionTitle,
+                    message: message
+                }
+            );
+
+            alert("Decision saved ✅");
+            location.reload();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error ❌");
+        });
+}
+
+function scheduleInterview(email, name, userId) {
+    const date = document.getElementById("date_" + userId).value;
+    const time = document.getElementById("time_" + userId).value;
+    const mode = document.getElementById("mode_" + userId).value;
+
+    if (!date || !time || !mode) {
+        alert("Please fill all interview details");
+        return;
+    }
+
+    // 1️⃣ Save to backend
+    fetch("/save_schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            user_id: userId,
+            date: date,
+            time: time,
+            mode: mode
+        })
+    })
+    .then(res => res.json())
+    .then(() => {
+        // 2️⃣ Send email
+        emailjs.send(
+            "service_9xxnbbh",
+            "template_nxmv7zb",
+            {
+                to_email: email,
+                name: name,
+                decision: "INTERVIEW SCHEDULED 📅",
+                message: `Your interview is scheduled on ${date} at ${time} (${mode}).`
+            }
+        );
+
+        alert("Interview Scheduled ✅");
+        location.reload();
+    });
+}
+</script>
+
+</body>
+</html>

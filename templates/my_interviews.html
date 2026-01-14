@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Interviews | AI Recruitment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+    <h2 class="page-title">📊 My Interview History</h2>
+
+    {% if interviews %}
+        <div class="interview-wrapper">
+
+            {% for i in interviews %}
+                <div class="report-card">
+
+                    <div class="score-box">
+                        <span class="score">{{ i.score }}%</span>
+
+                        {% if i.readiness == "Ready" %}
+                            <span class="status ready">READY ✅</span>
+                        {% else %}
+                            <span class="status not-ready">NEEDS PRACTICE ❌</span>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <h4>⚠ Weak Areas</h4>
+
+                    {% if i.weak_areas %}
+                        <ul class="weak-list">
+                            {% for w in i.weak_areas %}
+                                <li>{{ w }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="no-weak">🎉 No weak areas</p>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <p class="empty-msg">You have not taken any interviews yet.</p>
+    {% endif %}
+
+    <div class="back-btn">
+        <a href="/dashboard" class="btn-primary">⬅ Back to Dashboard</a>
+    </div>
+
+</div>
+
+</body>
+</html>

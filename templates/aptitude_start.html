@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Start Aptitude Test</title>
+    <style>
+        body {
+            margin:0;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:#020617;
+            font-family:Segoe UI;
+            color:white;
+        }
+        .box {
+            background:#1e293b;
+            padding:40px;
+            border-radius:16px;
+            width:350px;
+            text-align:center;
+        }
+        select, button {
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            border-radius:10px;
+            border:none;
+        }
+        button {
+            background:#2563eb;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>🧠 Aptitude Test</h2>
+    <p>Select your experience level</p>
+
+    <form method="POST" action="/start_aptitude">
+        <select name="experience" required>
+            <option value="">Select experience</option>
+            <option value="0">Fresher (0 years)</option>
+            <option value="1">1 year experience</option>
+            <option value="2">2+ years experience</option>
+        </select>
+
+        <button type="submit">Start Test</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Decision History</title>
+    <style>
+        body{
+            font-family:Segoe UI;
+            background:#020617;
+            color:#e5e7eb;
+            padding:40px;
+        }
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:20px;
+        }
+        th,td{
+            padding:12px;
+            border-bottom:1px solid #1e293b;
+            text-align:left;
+        }
+        th{ color:#38bdf8; }
+        .shortlisted{ color:#22c55e; font-weight:600; }
+        .rejected{ color:#ef4444; font-weight:600; }
+        .pending{ color:#facc15; font-weight:600; }
+        .back{
+            display:inline-block;
+            margin-bottom:20px;
+            color:#38bdf8;
+            text-decoration:none;
+            font-weight:600;
+        }
+    </style>
+</head>
+<body>
+
+<a href="/dashboard" class="back">← Back to Dashboard</a>
+
+<h2>📜 HR Decision History</h2>
+
+{% if history %}
+<table>
+    <tr>
+        <th>Candidate</th>
+        <th>Email</th>
+        <th>Job</th>
+        <th>Status</th>
+        <th>Interview</th>
+    </tr>
+
+    {% for h in history %}
+    <tr>
+        <td>{{ h.name }}</td>
+        <td>{{ h.email }}</td>
+        <td>{{ h.job_title }}</td>
+
+        <td>
+            {% if h.status|lower == "shortlisted" %}
+                <span class="shortlisted">Shortlisted</span>
+            {% elif h.status|lower == "rejected" %}
+                <span class="rejected">Rejected</span>
+            {% else %}
+                <span class="pending">Pending</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if h.schedule %}
+                {{ h.schedule.date }} {{ h.schedule.time }} ({{ h.schedule.mode }})
+            {% else %}
+                —
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No history found.</p>
+{% endif %}
+
+</body>
+</html>

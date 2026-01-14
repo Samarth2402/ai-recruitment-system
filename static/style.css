@@ -1,0 +1,563 @@
+/* ================= RESET & BASE ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #0f172a; /* dark background */
+    color: #e5e7eb;
+}
+
+/* ================= LINKS ================= */
+a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 500;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* ================= PAGE WRAPPER ================= */
+.page {
+    min-height: 100vh;
+    padding: 40px 60px;
+}
+
+/* ================= HEADINGS ================= */
+h1, h2, h3 {
+    color: #f9fafb;
+}
+
+/* ================= DASHBOARD HEADER ================= */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-header h2 {
+    font-size: 28px;
+}
+
+.role {
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* ================= CARD GRID ================= */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+/* ================= DASHBOARD CARD ================= */
+.card {
+    background: linear-gradient(135deg, #1e293b, #020617);
+    border-radius: 18px;
+    height: 140px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 18px 45px rgba(96,165,250,0.35);
+}
+
+.card span {
+    margin-top: 12px;
+    font-size: 16px;
+    color: #e5e7eb;
+    font-weight: 600;
+}
+
+/* Highlight card */
+.card.highlight {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+/* ================= TABLES ================= */
+.table-container {
+    background: #020617;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+}
+
+.applied-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: #020617;
+}
+
+.applied-table th {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    text-align: left;
+    padding: 14px;
+}
+
+.applied-table td {
+    padding: 14px;
+    border-bottom: 1px solid #1e293b;
+    color: #e5e7eb;
+}
+
+.applied-table tr:hover {
+    background: #0f172a;
+}
+
+/* ================= STATUS BADGES ================= */
+.status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status.Applied {
+    background: #1e3a8a;
+    color: #bfdbfe;
+}
+
+.status.Shortlisted {
+    background: #14532d;
+    color: #bbf7d0;
+}
+
+.status.Rejected {
+    background: #7f1d1d;
+    color: #fecaca;
+}
+
+/* ================= BUTTONS ================= */
+.btn-primary {
+    display: inline-block;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: scale(1.08);
+}
+
+/* ================= LOGOUT ================= */
+.logout {
+    display: block;
+    margin-top: 40px;
+    text-align: center;
+    color: #f87171;
+    font-weight: 600;
+}
+
+/* ===== INTERVIEW HISTORY FULL WIDTH ===== */
+
+.interview-wrapper {
+    width: 100%;
+    max-width: 1400px;   /* keeps it clean on big screens */
+    margin: 0 auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #020617, #1e293b);
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+}
+
+.interview-wrapper h3 {
+    margin-top: 20px;
+    color: #f9fafb;
+}
+
+.interview-wrapper ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.interview-wrapper li {
+    margin-bottom: 10px;
+    color: #e5e7eb;
+    font-size: 15px;
+}
+
+/* score row */
+.interview-score {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.interview-score span {
+    font-weight: bold;
+}
+
+/* ===== UPLOAD RESUME PAGE FIX ===== */
+
+.upload-wrapper {
+    width: 100%;
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-card {
+    background: linear-gradient(135deg, #020617, #1e293b);
+    padding: 35px;
+    border-radius: 18px;
+    width: 420px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+.upload-card input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #020617;
+    color: #e5e7eb;
+    border: 1px solid #334155;
+    margin-bottom: 20px;
+}
+
+.upload-card button {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #38bdf8;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ===== FULL PAGE DARK LAYOUT ===== */
+.page-full {
+    min-height: 100vh;
+    width: 100%;
+    padding: 30px 50px;
+    background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+/* Page title */
+.page-full h2 {
+    color: #e5e7eb;
+    margin-bottom: 20px;
+}
+
+/* Back link */
+.page-full .back-link,
+.page-full a {
+    color: #38bdf8;
+}
+
+/* ===== JOBS PAGE DARK UI ===== */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.job-card-dark {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease;
+}
+
+.job-card-dark:hover {
+    transform: translateY(-6px);
+}
+
+.job-card-dark h3 {
+    color: #e5e7eb;
+    margin-bottom: 8px;
+}
+
+.job-card-dark p {
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+/* Inputs grid */
+.job-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.job-inputs input {
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #e5e7eb;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.job-inputs input::placeholder {
+    color: #64748b;
+}
+
+/* Apply button */
+.job-card-dark button {
+    width: 100%;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.job-card-dark button:hover {
+    transform: scale(1.03);
+}
+
+/* ===== MOCK INTERVIEW FULL PAGE ===== */
+.interview-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 80px;
+}
+
+/* Question cards */
+.question-card {
+    background: rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.question-card label {
+    color: #e5e7eb;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.question-card textarea {
+    width: 100%;
+    min-height: 80px;
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    resize: none;
+    font-size: 14px;
+}
+
+.question-card textarea:focus {
+    outline: none;
+    border-color: #38bdf8;
+}
+
+/* Submit button center */
+.submit-btn {
+    display: block;
+    margin: 30px auto;
+    width: 260px;
+    font-size: 16px;
+}
+
+/* ===== MOCK INTERVIEW LAYOUT FIX ===== */
+
+.interview-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.back-wrapper {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 10px 26px;
+}
+
+/* ===== POST JOB PAGE ===== */
+.page-full {
+    min-height: 100vh;
+    width: 100%;
+    padding: 40px 80px;
+    background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+.page-full h2 {
+    margin-bottom: 30px;
+    color: #e5e7eb;
+}
+
+.job-form {
+    max-width: 900px;
+}
+
+.job-form input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 18px;
+    background: #020617;
+    border: 1px solid #1e293b;
+    color: #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.job-form input::placeholder {
+    color: #64748b;
+}
+
+.job-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.job-form button {
+    width: 260px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 25px;
+    color: #38bdf8;
+    font-weight: 600;
+}
+
+/* ===== APTITUDE COMMON ===== */
+
+.test-page, .result-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: #e5e7eb;
+    font-family: "Segoe UI", sans-serif;
+    padding: 40px;
+}
+
+.test-card, .result-card {
+    max-width: 800px;
+    margin: auto;
+    background: #020617;
+    padding: 30px 35px;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+
+.page-title {
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+/* ===== QUESTIONS ===== */
+
+.question-box {
+    background: #0f172a;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
+
+.question-box h4 {
+    margin-bottom: 12px;
+    color: #f1f5f9;
+}
+
+.option {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.option input {
+    margin-right: 8px;
+}
+
+/* ===== BUTTONS ===== */
+
+.btn-main {
+    display: block;
+    width: 220px;
+    margin: 30px auto 0;
+    padding: 12px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.btn-main:hover {
+    transform: scale(1.05);
+}
+
+/* ===== RESULT PAGE ===== */
+
+.score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: #020617;
+    border: 6px solid #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px auto;
+    font-size: 26px;
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+.status-pass {
+    color: #22c55e;
+    font-weight: 600;
+    text-align: center;
+    font-size: 18px;
+}
+
+.status-fail {
+    color: #ef4444;
+    font-weight: 600;
+    text-align: center;
+    font-size: 18px;
+}
+
+.back-btn {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    color: #38bdf8;
+    font-weight: 600;
+    text-decoration: none;
+}

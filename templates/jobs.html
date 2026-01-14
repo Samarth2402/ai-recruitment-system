@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jobs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page-full">
+    <h2 class="page-title">Available Jobs</h2>
+
+    {% if jobs %}
+    <div class="jobs-grid">
+        {% for job in jobs %}
+        <div class="job-card-dark">
+
+            <h3>{{ job.title }}</h3>
+            <p><strong>Skills:</strong> {{ job.skills }}</p>
+
+            <form method="POST" action="{{ url_for('apply_job', job_id=job.job_id) }}">
+                <div class="job-inputs">
+                    <input type="number" name="experience" placeholder="Experience (years)" min="0" required>
+
+                    <input type="number" name="tenth"
+                           placeholder="10th %"
+                           min="0" max="100"
+                           required>
+
+                    <input type="number" name="twelfth"
+                           placeholder="12th %"
+                           min="0" max="100"
+                           required>
+
+                    <input type="number" name="graduation"
+                           placeholder="Graduation %"
+                           min="0" max="100"
+                           required>
+
+                    <button type="submit">Apply</button>
+                </div>
+            </form>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+        <!-- ✅ NO JOBS MESSAGE -->
+        <div style="
+            margin-top: 50px;
+            text-align: center;
+            font-size: 18px;
+            color: #94a3b8;
+        ">
+            ❌ No jobs available right now
+        </div>
+    {% endif %}
+
+    <a href="/dashboard" class="back-link">← Back</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR | Aptitude Candidates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+<h2>🧠 Aptitude Test Candidates</h2>
+
+{% if candidates %}
+<table class="applied-table">
+    <tr>
+        <th>#</th>
+        <th>Candidate</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+
+    {% for c in candidates %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.email }}</td>
+        <td>
+            <a href="/hr_aptitude/{{ c.id }}" class="btn-link">
+                View Result →
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No aptitude attempts yet.</p>
+{% endif %}
+
+<br>
+<a href="/dashboard" class="back-link">← Back</a>
+</div>
+
+</body>
+</html>

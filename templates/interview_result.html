@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container result">
+    <h2>📊 Interview Result</h2>
+
+    <p><b>Score:</b> {{ score }}%</p>
+    <p><b>Readiness:</b> {{ readiness }}</p>
+
+    {% if weak_areas %}
+        <h4>⚠ Weak Areas</h4>
+        <ul>
+            {% for w in weak_areas %}
+                <li>{{ w }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>✅ Excellent! No weak areas detected.</p>
+    {% endif %}
+
+    <a href="/dashboard" class="btn-primary">Back to Dashboard</a>
+</div>
+
+</body>
+</html>

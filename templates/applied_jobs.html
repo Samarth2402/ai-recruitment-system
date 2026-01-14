@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Applied Jobs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page-full">
+    <h2 class="page-title">Applied Jobs</h2>
+
+    {% if jobs %}
+        <div class="jobs-grid">
+            {% for job in jobs %}
+            <div class="job-card-dark">
+                <h3>{{ job.job_title }}</h3>
+
+                <p><b>Status:</b>
+                    <span style="color:#38bdf8;">{{ job.status }}</span>
+                </p>
+
+                <p>Experience: {{ job.experience }} yrs</p>
+                <p>10th: {{ job.tenth }}%</p>
+                <p>12th: {{ job.twelfth }}%</p>
+                <p>Graduation: {{ job.graduation }}%</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="text-align:center;color:#94a3b8;">
+            No jobs applied yet.
+        </p>
+    {% endif %}
+
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+</div>
+
+</body>
+</html>

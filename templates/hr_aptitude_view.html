@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR | Aptitude Result</title>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        emailjs.init("TDVCcIay43p3fA3rJ");
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+<h2>🧠 Aptitude Result</h2>
+
+<div class="report-card">
+
+    <h3>{{ user.name }}</h3>
+    <p>{{ user.email }}</p>
+
+    <hr>
+
+    <p><b>Level:</b> {{ result.level | upper }}</p>
+    <p><b>Score:</b> {{ result.score }} / {{ result.total }}</p>
+
+    <p>
+        <b>Status:</b>
+        {% if result.decision == "tech" %}
+            <span style="color:#22c55e; font-weight:600;">Selected for Tech Round</span>
+        {% elif result.decision == "rejected" %}
+            <span style="color:#ef4444; font-weight:600;">Rejected</span>
+        {% else %}
+            <span style="color:#facc15; font-weight:600;">Pending</span>
+        {% endif %}
+    </p>
+
+    <!-- ✅ SHOW BUTTONS ONLY IF NOT DECIDED -->
+    {% if result.decision != "tech" and result.decision != "rejected" %}
+    <div style="margin-top:20px;">
+        <button onclick="sendDecision('tech')" class="btn-success">
+            ✅ Select for Tech Round
+        </button>
+
+        <button onclick="sendDecision('rejected')" class="btn-danger">
+            ❌ Reject
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+
+<br>
+<a href="/hr_aptitude" class="back-link">← Back</a>
+
+</div>
+
+<script>
+function sendDecision(decision) {
+
+    const userId = {{ user.id }};
+    const email = "{{ user.email }}";
+    const name = "{{ user.name }}";
+
+    let subject, message;
+
+    if (decision === "tech") {
+        subject = "Selected for Technical Round 🎉";
+        message = `Hello ${name},
+
+Congratulations!
+You have cleared the aptitude test and are selected for the TECHNICAL ROUND.
+
+HR will contact you soon with further details.
+
+Best of luck!
+AI Recruitment System`;
+    } else {
+        subject = "Aptitude Result";
+        message = `Hello ${name},
+
+Thank you for taking the aptitude test.
+Unfortunately, you were not selected for the next round.
+
+We wish you all the best for future opportunities.
+
+Regards,
+AI Recruitment System`;
+    }
+
+    // 1️⃣ Send email
+    emailjs.send(
+        "service_9xxnbbh",
+        "template_nxmv7zb",
+        {
+            to_email: email,
+            name: name,
+            decision: subject,
+            message: message
+        }
+    );
+
+    // 2️⃣ Update backend
+    fetch(`/hr_aptitude_decision/${userId}/${decision}`)
+        .then(() => {
+            alert("Decision saved & email sent ✅");
+            location.reload();
+        });
+}
+</script>
+
+</body>
+</html>

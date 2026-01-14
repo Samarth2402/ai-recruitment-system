@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aptitude Test</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: #e5e7eb;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timer {
+            background: #1e293b;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #22c55e;
+        }
+
+        .question {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin: 6px 0;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: #2563eb;
+            border: none;
+            padding: 12px 25px;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .start-box {
+            text-align: center;
+            margin-top: 120px;
+        }
+
+        .start-box button {
+            padding: 14px 35px;
+            font-size: 18px;
+            border-radius: 25px;
+            background: #22c55e;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>🧠 Aptitude Test ({{ level|upper }})</h2>
+        <div class="timer" id="timer">10:00</div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="startBox" class="start-box">
+        <h2>🧠 Aptitude Test</h2>
+        <p>Click start to begin the test in fullscreen mode</p>
+        <button onclick="startTest()">Start Test</button>
+    </div>
+
+    <!-- TEST AREA -->
+    <div id="testBox" style="display:none;">
+
+        <form id="testForm" method="POST" action="/submit_aptitude">
+
+            {% for q in questions %}
+            <div class="question">
+                <h4>Q{{ loop.index }}. {{ q.question }}</h4>
+
+                {% for opt in q.options %}
+                <label>
+                    <input type="radio" name="{{ q.id }}" value="{{ opt }}" required>
+                    {{ opt }}
+                </label>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Submit Test</button>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+/* ---------------- GLOBAL ---------------- */
+let testStarted = false;
+let timerInterval;
+let totalSeconds = 10 * 60; // 10 minutes
+
+const timerEl = document.getElementById("timer");
+const form = document.getElementById("testForm");
+
+/* ---------------- FULLSCREEN ---------------- */
+function goFullScreen() {
+    let elem = document.documentElement;
+
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+}
+
+/* ---------------- START TEST ---------------- */
+function startTest() {
+    testStarted = true;
+
+    goFullScreen();
+
+    document.getElementById("startBox").style.display = "none";
+    document.getElementById("testBox").style.display = "block";
+
+    startTimer();
+}
+
+/* ---------------- TIMER ---------------- */
+function startTimer() {
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    let min = Math.floor(totalSeconds / 60);
+    let sec = totalSeconds % 60;
+
+    timerEl.textContent =
+        String(min).padStart(2, "0") + ":" +
+        String(sec).padStart(2, "0");
+
+    if (totalSeconds <= 0) {
+        alert("⏰ Time up! Test submitted.");
+        form.submit();
+    }
+    totalSeconds--;
+}
+
+/* ---------------- ANTI CHEAT ---------------- */
+
+// Tab switch / minimize
+document.addEventListener("visibilitychange", () => {
+    if (testStarted && document.hidden) {
+        alert("⚠️ You left the test. Submitting now.");
+        form.submit();
+    }
+});
+
+// Exit fullscreen
+document.addEventListener("fullscreenchange", () => {
+    if (testStarted && !document.fullscreenElement) {
+        alert("⚠️ Fullscreen required!");
+        goFullScreen();
+    }
+});
+
+// Disable right click
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// Disable copy / paste / select
+["copy", "paste", "cut", "selectstart"].forEach(evt => {
+    document.addEventListener(evt, e => e.preventDefault());
+});
+
+// Block keys
+document.addEventListener("keydown", e => {
+    if (
+        e.key === "F12" ||
+        (e.ctrlKey && ["c", "v", "x", "u", "s"].includes(e.key.toLowerCase()))
+    ) {
+        e.preventDefault();
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+[
+    {
+        "user_id": 1,
+        "name": "Samarth",
+        "email": "ss9879086402@gmail.com",
+        "score": 0,
+        "weak_areas": [
+            "What is Python and where is it used?",
+            "Explain list vs tuple in Python.",
+            "What is a dictionary?",
+            "What are functions in Python?",
+            "Explain OOP concepts in Python."
+        ],
+        "readiness": "Needs Improvement",
+        "hr_decision": "pending"
+    }
+]

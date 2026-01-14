@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Job</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page-full">
+
+    <h2>📢 Post New Job</h2>
+
+    <form method="POST" class="job-form">
+
+        <input type="text" name="title" placeholder="Job Title" required>
+
+        <input type="text" name="skills" placeholder="Required Skills (comma separated)" required>
+
+        <div class="job-grid">
+            <input type="number" name="min_exp" placeholder="Min Experience (years)" required>
+            <input type="number" name="max_exp" placeholder="Max Experience (years)" required>
+
+            <input type="number" name="min_10" placeholder="Min 10th %" required>
+            <input type="number" name="min_12" placeholder="Min 12th %" required>
+            <input type="number" name="min_grad" placeholder="Min Graduation %" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Post Job</button>
+    </form>
+
+    <a href="/dashboard" class="back-link">← Back</a>
+
+</div>
+</body>
+</html>
